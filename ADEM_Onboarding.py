@@ -41,7 +41,7 @@ def verifyauth():
                 
             # Check if the file contains the expected number of lines
             if len(lines) < 3:
-                print("Invalid file format")
+                print("Invalid Auth File")
                 return ("noauth")
             else:
                 # Read the contents of the file
@@ -176,7 +176,7 @@ def AdemPreRule():
     time.sleep(2)
     PolicyUrl = "https://api.sase.paloaltonetworks.com/sse/config/v1/security-rules?position=pre&folder=Shared"
     payload = json.dumps({
-        "name": "ADEM via API",
+        "name": "ADEM",
         "description": "ADEM Service",
         "action": "allow",
         "application": [
@@ -220,6 +220,7 @@ def AdemPreRule():
         print("Response Details", response.text)
 
 def Script():
+    AccessResponse = ""
     print("")
     print("-------------------------------------")
     print ("Start ADEM Onboarding Script ")
