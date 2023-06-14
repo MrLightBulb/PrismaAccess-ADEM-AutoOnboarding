@@ -1,32 +1,51 @@
 import requests
 import json
 import time
-
-AccessUrl = "https://auth.apps.paloaltonetworks.com/oauth2/access_token"
-client_id = "beluxapi@1530061237.iam.panserviceaccount.com"
-client_secret = "369b22be-dc0a-4473-958b-d12018fb98f9"
-tsg_id = "1530061237"
-
-data = {
-    "grant_type": "client_credentials",
-    "scope": f"tsg_id:{tsg_id}"
-}
-
-headers = {
-    "Content-Type": "application/x-www-form-urlencoded"
-}
-
-response = requests.post(AccessUrl, data=data, headers=headers, auth=(client_id, client_secret))
-
-if response.status_code == 200:
-    access_token = response.json().get("access_token")
+def main():
+    print("")
     print("-------------------------------------")
-    print("Generating Access Token ...")
-    time.sleep(2)
-    print("One Time Access Token Succesfully Generated")
-    time.sleep(2)
-else:
-    print("Error:", response.text)
+    print ("Start ADEM Onboarding Script ")
+    print("-------------------------------------")
+    AccessTokenAge,
+
+def AccessTokenAge():
+    print("Checking Access Token vadility")
+    age:1
+    
+    return(age)
+
+def AccessToken():
+    print ("fill in the Access information in below prompts ")
+    client_id  = input("Enter yoour client-id: ")
+    client_secret = input ("Enter your client-secret: ")
+    tsg_id = input("Enter TSG ID of your tenant: ")
+    AccessUrl = "https://auth.apps.paloaltonetworks.com/oauth2/access_token"
+    
+    #client_id = "beluxapi@1530061237.iam.panserviceaccount.com"
+    #client_secret = "369b22be-dc0a-4473-958b-d12018fb98f9"
+    #tsg_id = "1530061237"
+
+    data = {
+        "grant_type": "client_credentials",
+        "scope": f"tsg_id:{tsg_id}"
+        }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+        }
+
+    response = requests.post(AccessUrl, data=data, headers=headers, auth=(client_id, client_secret))
+
+    if response.status_code == 200:
+        access_token = response.json().get("access_token")
+        print("-------------------------------------")
+        print("Generating Access Token ...")
+        time.sleep(2)
+        print("One Time Access Token Succesfully Generated")
+        time.sleep(2)
+    else:
+        print("Error:", response.text)
+
 print("-------------------------------------")
 print("Creating FQDN Objects for ADEM ... ")
 time.sleep(2)
