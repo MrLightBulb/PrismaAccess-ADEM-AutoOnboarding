@@ -48,7 +48,8 @@ def verifyauth():
                 return ("noauth")
             else:
                 # Read the contents of the file
-                print("Found Auth File")
+                print("Found Auth Information")
+                print("auth info valid")
                 with open(file_path, "r") as file:
                     lines = file.readlines()
                     #Extract the values from the lines
@@ -74,9 +75,6 @@ def TokenGeneration():
     global tsg_id
     global access_token
     print("")
-    print("Generating Token .... ")
-    print("values in tokengenerator:")
-    print("id  ", client_id,"secret ", client_secret, " tsg ", tsg_id) 
     AccessUrl = "https://auth.apps.paloaltonetworks.com/oauth2/access_token"
     data = {"grant_type": "client_credentials","scope": f"tsg_id:{tsg_id}"}
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -98,8 +96,6 @@ def WriteToAuthFile():
     global client_id
     global client_secret
     global tsg_id
-    print("values in write to file:")
-    print("id  ", client_id,"secret ", client_secret, " tsg ", tsg_id) 
     file_path = "./auth.txt"
 
     # Create the file
@@ -111,7 +107,9 @@ def WriteToAuthFile():
         file.write(client_id + "\n")
         file.write(client_secret + "\n")
         file.write(tsg_id + "\n")
-        print("Values written to the file:", file_path)
+        print("")
+        print("Auth info Saved")
+        time.sleep(1)
 
 def FQDNobjects():
     print("-------------------------------------")
@@ -272,15 +270,17 @@ def Script():
         print("")
         print("Token expired")
         print("Restarting authentication proces...")
+        Authentication()
+        TokenResult = TokenGeneration()
         time.sleep(2)
-        if AccessResponse == "success":
+        if TokenResult == "success":
             FQDNobjects()
             DynamicAddressGroup()
             AdemPreRule()
             print("-------------------------------------")
             print ("Script ended succesfully")
             print("-------------------------------------")
-        if AccessResponse == "fail":
+        if TokenResult == "fail":
             print("")
             print("!! Authentication failed, Please verify credentials !!")
             print("")
