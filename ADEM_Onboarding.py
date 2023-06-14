@@ -13,6 +13,9 @@ access_token = ''
 
 def verifyauth():
     # Check if the file exists
+    global client_id
+    global client_secret
+    global tsg_id
     print("")
     print ("Start auth Verification..... ")
     file_path = "./auth.txt"
