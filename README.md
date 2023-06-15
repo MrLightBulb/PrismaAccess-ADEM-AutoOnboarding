@@ -47,29 +47,19 @@ due to missing API calls this is currently not possible, waiting for new API too
 # How It Works
 This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.
 In order to leverage the API calls we need to create a Bearer Token to perform the calls.
+The bearor token is generated from the Tenant Service Account infomration you need to provide in the '/.prismaaccess/credentials.json' file
+
+More information how it works can be found in the official Palo Alto Networks documentations:
 - Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/getstarted/)
 - Bearer token [documentation](https://pan.dev/sase/docs/access-tokens/)
 
-
-If there is no bearer token yet the script will prompt you to authenticate using the Tenant Service Acccount 
-
-The Bearer Token is generated via the Oauth2 protocol using the palo alto networks Prisma Access `Tenant Service Account` these will be saved in the local directory under auth.txt. Once we have the auth information we can generate a Bearer token from the service account info. 
-
-Bearer Tokens are only valid for 15min. 
-This is the reason why there is a TokenVerify function, this will verify if the authentication informaton is present or expired.
-- In case it is expired we will delete the auth.txt file and it will restart the authentication proces.
-- In case the auth.txt file is not present , this indicates that you have not authenticated yet and the authenticaton proces will be initiated.
-- In case the auth.txt file is present and not expired, the script will auto generate the bearor tokeen without reinitiating the authenticatioin proces
-
-Once authenticaton and Token generation has been succesfull,
-the script will start using the bearor token to push the FQDN objects, Dynamic Address Group and PreRule all in Shared Level. 
-
+A bearor token is valid for 15min.
+Each time you run the script a new unique bearor token is generated. 
 
 # How to use
 when the github respoistory has been downloaded launch the script by following command :
 ```bash
 $ python3 ADEM_Onboarding.py
 ```
-Follow the terminal instructions that will be prompted. 
 if succesfull your script should end with the message "script ended succefully"
 if unsuccesfull your script should end with message "sceript ended with issues"
