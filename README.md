@@ -30,6 +30,7 @@ $ pip3 install requests
 
 - Auto Commit changes after user input 
 - Adding naming convetion
+- Redefine auth process, avoind to use auth.txt
 
 # Long Term Roadmap:
 
