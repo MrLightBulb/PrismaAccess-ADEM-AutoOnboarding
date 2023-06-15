@@ -26,7 +26,7 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 - Auto Generate a Dynamic Address group that consists all the ADEM FQDN objects
 - Auto Generate a Pre-Rule Policy to allow traffic towards the ADEM FQND Service Objects
 
-# what it cannot do
+# What it cannot do
 
 - Commit the changes, it will only generate a config candidate, this means you still need to perform a commit in the interface
 - Choosing a name convention for your objects.
@@ -37,7 +37,6 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 
 - Auto Commit changes after user input 
 - Adding naming convetion
-- Redefine auth process, avoind to use auth.txt
 
 # Long Term Roadmap:
 
