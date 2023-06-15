@@ -19,13 +19,6 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 }
 ```
 
-Createa virtual env and install requirements of this script:
-
-```bash
-python3 -m virtualenv venv && source venv/bin/activate
-pip3 install -r requirements.txt
-```
-
 # What it can do
 
 - This only works for Prisma Access Cloud Management

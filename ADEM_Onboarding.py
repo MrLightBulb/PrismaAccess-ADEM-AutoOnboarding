@@ -1,17 +1,21 @@
-__author__ = "Rutger Truyers"
+__author__ = "Rutger Truyers, rtruyers@paloaltonetworks.com"
 
 import os
 import requests
 import json
 import time
 
+def VerifyConfigFile():
+    file_path = './prismaaccess/credentials.json'
+    if os.path.exists(file_path):
+        return (True)
+    else:
+        return (False)
+    
 
 def FQDNobjects(config_api_endpoint, access_token):
-    print("-------------------------------------")
-    print("Creating FQDN Objects for ADEM ... ")
+    print("Creating FQDN Objects for ADEM ...\n")
     time.sleep(2)
-    print("")
-
     with open("ademfqdn.txt", "r") as file:
         AdemFQDN = file.read().splitlines()
 
@@ -20,14 +24,9 @@ def FQDNobjects(config_api_endpoint, access_token):
         payload = json.dumps({"description": "ADEM via API", "name": i, "tag": ["ADEM"], "fqdn": i})
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
         response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
-        print(response.status_code)
         if response.status_code == 201:
-            print(i, "Created OK")
+            print("\033[1;32m" + "Object Created: " + "\033[0m \t" + i)
         elif response.status_code == 404:
-            print("")
-            print("!!! TEST ADEM FQDN OBject", i, "Creation Error !!!")
-            print("Response From Server: ")
-
             error_messages = []
             # Extract error messages from 'details'
             for error in response.json().get("_errors"):
@@ -36,16 +35,13 @@ def FQDNobjects(config_api_endpoint, access_token):
 
             # Print error messages
             for message in error_messages:
-                print(message)
-                
-            print("")
+                print("\t\033[1;31m"+ message + ": \033[0m" + i )
             
         else:
-            print("")
-            print("!!! ADEM FQDN OBject", i, "Creation Error !!!")
+            print("\n"+"\033[1;31m"+"Object Error:"+ "\033[0m\t" + i)
             print("Response From Server: ")
             print(response.text)
-            print("")
+
 
 
 def DynamicAddressGroup(config_api_endpoint, access_token):
@@ -53,27 +49,28 @@ def DynamicAddressGroup(config_api_endpoint, access_token):
     ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/address-groups?folder=Shared"
     payload = json.dumps({"description": "ADEM Group via API", "name": "ADEM", "dynamic": {"filter": "ADEM"}})
     time.sleep(2)
-    print("")
-    print("-------------------------------------")
-    print("Creating a dynamic address ojbect for adem....")
-    print("")
+    print("\nCreating a dynamic address Object for adem....\n")
     time.sleep(2)
     # API Request for Dynamic Group Object#
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
     response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
 
     if response.status_code == 201:
-        print("ADEM Dynamic AddressGroup Succesfully Created")
-        print("")
+        print("\tADEM Dynamic AddressGroup Creation\t\033[1;32mSuccess\033[0m\n")
     else:
-        print("ADEM Dynamic AddressGroup Error")
-        print("Response Error:", response.status_code)
-        print("Response Details", response.text)
+        error_messages = []
+        # Extract error messages from 'details'
+        for error in response.json().get("_errors"):
+            details = error.get('details', {})
+            error_messages.append(details.get('message', ''))
+
+        # Print error messages
+        for message in error_messages:
+            print("\t"+"\033[1;31m"+ message + ": \033[0m" + "ADEM (address group)\n" )
 
 
 def AdemPreRule(config_api_endpoint, access_token):
-    print("-------------------------------------")
-    print("Creating ADEM Pre Rule in Shared ... ")
+    print("Creating ADEM Pre Rule in Shared ... \n")
     time.sleep(2)
     PolicyUrl = f"https://{config_api_endpoint}/sse/config/v1/security-rules?position=pre&folder=Shared"
     payload = json.dumps(
@@ -94,14 +91,17 @@ def AdemPreRule(config_api_endpoint, access_token):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
     response = requests.request("POST", PolicyUrl, headers=headers, data=payload)
     if response.status_code == 201:
-        print("")
-        print("PreRule Policy Created Successfully")
-        print("")
+        print("\tAdem PreRule Policy Creation\t\033[1;32m\tSuccess\033[0m\n")
     else:
-        print("")
-        print("PreRule Policy Created Failed")
-        print("Response Error:", response.status_code)
-        print("Response Details", response.text)
+        error_messages = []
+        # Extract error messages from 'details'
+        for error in response.json().get("_errors"):
+            details = error.get('details', {})
+            error_messages.append(details.get('message', ''))
+
+        # Print error messages
+        for message in error_messages:
+            print("\t" + "\033[1;31m"+ message + ": \033[0m" + "ADEM (PreRule Security Rule in Shared)\n" )
 
 
 
@@ -133,19 +133,34 @@ def getParamFromJson(config_file):
 
 
 def main():
-    CONFIG_FILE = os.environ['HOME'] + "/.prismaaccess/credentials.json"
-    AUTH_API_ENDPOINT, CONFIG_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET = getParamFromJson(
-        CONFIG_FILE)
-    access_token = login_saas(
-        AUTH_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET)
-    
-    FQDNobjects(CONFIG_API_ENDPOINT, access_token)
-    DynamicAddressGroup(CONFIG_API_ENDPOINT, access_token)
-    AdemPreRule(CONFIG_API_ENDPOINT, access_token)
-    print("-------------------------------------")
-    print("Script ended succesfully")
-    print("-------------------------------------")
+    print("\n-------------------------------------")
+    print("Script Started")
+    print("-------------------------------------\n")
+    print("Generating Auth Token ...")
+    time.sleep(2)       
+    if VerifyConfigFile() == True:
+        CONFIG_FILE = "./prismaaccess/credentials.json"
+        #read out client credentials
+        AUTH_API_ENDPOINT, CONFIG_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET = getParamFromJson(
+            CONFIG_FILE)
+        #token generation
+        access_token = login_saas(
+            AUTH_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET)
+        print ("Auth Token "+ "\033[1;32m" + "\tSucceeded\033[0m\n")
+        FQDNobjects(CONFIG_API_ENDPOINT, access_token)
+        DynamicAddressGroup(CONFIG_API_ENDPOINT, access_token)
+        AdemPreRule(CONFIG_API_ENDPOINT, access_token)
+        print("-------------------------------------")
+        print("Script ended succesfully")
+        print("-------------------------------------")
+    elif VerifyConfigFile() == False:
+        print("\nCredentials file \033[1;33m" + "./prismaaccess/credentials.json" +"\033[0m is"+"\033[1;31m missing" + "\033[0m, \nThis is Required for Authentication")
+        print("Pleae refer to readme document on github for instructions")
+        print("-------------------------------------")
+        print("Script ended with \033[1;31m" + "issues"+ "\033[0m")
+        print("-------------------------------------")
 
+#os.environ['HOME'] + 
 
 if __name__ == "__main__":
     main()
