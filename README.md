@@ -57,7 +57,7 @@ Once authenticaton and Token generation has been succesfull,
 the script will start using the bearor token to push the FQDN objects, Dynamic Address Group and PreRule all in Shared Level. 
 
 
-# how to use
+# How to use
 when the github respoistory has been downloaded launch the script by following command :
 ```bash
 $ python3 ADEM_Onboarding.py
