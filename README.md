@@ -7,9 +7,23 @@ Define a Prisma Access Tenant `Service Account`, here is a [howto](https://docs.
 
 This service account is required in order to create an access token to use the API infrastructure of your Prisma Acces Tenant
 
-Make sure that you have python's `requests` module installed
+Create a file into home directory `.prismaaccess/credentials.json` with the following structure:
+
+```json
+{
+    "auth_api_endpoint": "auth.apps.paloaltonetworks.com",
+    "config_api_endpoint": "api.sase.paloaltonetworks.com",
+    "tsg_id": "<your_tsg_id>",
+    "client_id": "<your_client_id>",
+    "client_secret": "<your_client_secret>"
+}
+```
+
+Createa virtual env and install requirements of this script:
+
 ```bash
-$ pip3 install requests
+python3 -m virtualenv venv && source venv/bin/activate
+pip3 install -r requirements.txt
 ```
 
 # What it can do

@@ -1,166 +1,65 @@
+__author__ = "Rutger Truyers"
+
 import os
 import requests
 import json
 import time
 
-client_id = ''
-client_secret = ''
-tsg_id = ''
-VerifyAuthResult = ''
-TokenResult = ''
-access_token = ''
 
-
-def verifyauth():
-    # Check if the file exists
-    global client_id
-    global client_secret
-    global tsg_id
-    print("")
-    print ("Start auth Verification..... ")
-    file_path = "./auth.txt"
-    time.sleep(2)
-    if not os.path.isfile(file_path):
-        return ("noauth");
-    else:
-        # Get the file's modification time
-        file_modified_time = os.path.getmtime(file_path)
-        
-        # Get the current time
-        current_time = time.time()
-        
-        # Calculate the time difference in minutes
-        time_difference_minutes = (current_time - file_modified_time) / 60
-        
-        # Check if the file is older than 15 minutes
-        if time_difference_minutes > 15:
-            # Delete the file
-            os.remove(file_path)
-            return ("expired")
-        else:
-            #  Read the contents of the file
-            with open(file_path, "r") as file:
-                lines = file.readlines()
-                
-            # Check if the file contains the expected number of lines
-            if len(lines) < 3:
-                print("Invalid Auth File")
-                return ("noauth")
-            else:
-                # Read the contents of the file
-                print("Found Auth Information")
-                print("auth info valid")
-                with open(file_path, "r") as file:
-                    lines = file.readlines()
-                    #Extract the values from the lines
-                    client_id = lines[0].strip()
-                    client_secret = lines[1].strip()
-                    tsg_id = lines[2].strip()
-                return ("success")
-
-def Authentication():
-    print("")
-    print ("fill in the Access information in below prompts ")
-    global client_id
-    global client_secret
-    global tsg_id
-    client_id = input("Enter yoour client-id: ")
-    client_secret = input ("Enter your client-secret: ")
-    tsg_id = input("Enter TSG ID of your tenant: ")
-    WriteToAuthFile()
-
-def TokenGeneration():
-    global client_id
-    global client_secret
-    global tsg_id
-    global access_token
-    print("")
-    AccessUrl = "https://auth.apps.paloaltonetworks.com/oauth2/access_token"
-    data = {"grant_type": "client_credentials","scope": f"tsg_id:{tsg_id}"}
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(AccessUrl, data=data, headers=headers, auth=(client_id, client_secret))
-
-    if response.status_code == 200:
-        access_token = response.json().get("access_token")
-        print("-------------------------------------")
-        print("Generating Access Token ...")
-        time.sleep(2)
-        print("One Time Access Token Succesfully Generated")
-        time.sleep(2)
-        return("success")
-    else:
-        print("!!! One Time Access Token Geration Failed !!!")
-        return("fail")
-    
-def WriteToAuthFile():
-    global client_id
-    global client_secret
-    global tsg_id
-    file_path = "./auth.txt"
-
-    # Create the file
-    open(file_path, "w").close()
-
-    # Open the file in write mode and write the values
-    with open(file_path, "w") as file:
-        # Write the values to the file, each on a new line
-        file.write(client_id + "\n")
-        file.write(client_secret + "\n")
-        file.write(tsg_id + "\n")
-        print("")
-        print("Auth info Saved")
-        time.sleep(1)
-
-def FQDNobjects():
+def FQDNobjects(config_api_endpoint, access_token):
     print("-------------------------------------")
     print("Creating FQDN Objects for ADEM ... ")
     time.sleep(2)
     print("")
-    with open('ademfqdn.txt', 'r') as file: 
+
+    with open("ademfqdn.txt", "r") as file:
         AdemFQDN = file.read().splitlines()
-    ConfigUrl = "https://api.sase.paloaltonetworks.com/sse/config/v1/addresses?folder=Shared"
+
+    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/addresses?folder=Shared"
     for i in AdemFQDN:
-        payload = json.dumps({
-        "description": "ADEM via API",
-        "name": i,
-        "tag": ["ADEM"],
-        "fqdn": i
-        })
-        headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {access_token}'
-        }
+        payload = json.dumps({"description": "ADEM via API", "name": i, "tag": ["ADEM"], "fqdn": i})
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
         response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
+        print(response.status_code)
         if response.status_code == 201:
-            print(i,"Created OK")
+            print(i, "Created OK")
+        elif response.status_code == 404:
+            print("")
+            print("!!! TEST ADEM FQDN OBject", i, "Creation Error !!!")
+            print("Response From Server: ")
+
+            error_messages = []
+            # Extract error messages from 'details'
+            for error in response.json().get("_errors"):
+                details = error.get('details', {})
+                error_messages.append(details.get('message', ''))
+
+            # Print error messages
+            for message in error_messages:
+                print(message)
+                
+            print("")
+            
         else:
             print("")
-            print("!!! ADEM FQDN OBject",i, "Creation Error !!!")
+            print("!!! ADEM FQDN OBject", i, "Creation Error !!!")
             print("Response From Server: ")
             print(response.text)
             print("")
 
-def DynamicAddressGroup():
-    #Creating Dynamic Address Group For ADEM
-    ConfigUrl = "https://api.sase.paloaltonetworks.com/sse/config/v1/address-groups?folder=Shared"
-    payload = json.dumps({
-    "description": "ADEM Group via API",
-    "name": "ADEM",
-        "dynamic": {
-            "filter":"ADEM"
-        }
-    })
+
+def DynamicAddressGroup(config_api_endpoint, access_token):
+    # Creating Dynamic Address Group For ADEM
+    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/address-groups?folder=Shared"
+    payload = json.dumps({"description": "ADEM Group via API", "name": "ADEM", "dynamic": {"filter": "ADEM"}})
     time.sleep(2)
     print("")
     print("-------------------------------------")
     print("Creating a dynamic address ojbect for adem....")
     print("")
     time.sleep(2)
-    #API Request for Dynamic Group Object#
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {access_token}'
-    }
+    # API Request for Dynamic Group Object#
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
     response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
 
     if response.status_code == 201:
@@ -171,44 +70,28 @@ def DynamicAddressGroup():
         print("Response Error:", response.status_code)
         print("Response Details", response.text)
 
-def AdemPreRule():
+
+def AdemPreRule(config_api_endpoint, access_token):
     print("-------------------------------------")
     print("Creating ADEM Pre Rule in Shared ... ")
     time.sleep(2)
-    PolicyUrl = "https://api.sase.paloaltonetworks.com/sse/config/v1/security-rules?position=pre&folder=Shared"
-    payload = json.dumps({
-        "name": "ADEM",
-        "description": "ADEM Service",
-        "action": "allow",
-        "application": [
-            "any"
-        ],
-        "from": [
-            "trust"
-        ],
-        "source": [
-            "any"
-        ],
-        "source_user": [
-            "any"
-        ],
-        "to": [
-            "untrust"
-        ],
-        "destination": [
-            "ADEM"
-        ],
-        "service": [
-            "any"
-        ],
-        "category": [
-            "any"
-        ],
-    })
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {access_token}'
-    }
+    PolicyUrl = f"https://{config_api_endpoint}/sse/config/v1/security-rules?position=pre&folder=Shared"
+    payload = json.dumps(
+        {
+            "name": "ADEM",
+            "description": "ADEM Service",
+            "action": "allow",
+            "application": ["any"],
+            "from": ["trust"],
+            "source": ["any"],
+            "source_user": ["any"],
+            "to": ["untrust"],
+            "destination": ["ADEM"],
+            "service": ["any"],
+            "category": ["any"],
+        }
+    )
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
     response = requests.request("POST", PolicyUrl, headers=headers, data=payload)
     if response.status_code == 201:
         print("")
@@ -220,72 +103,51 @@ def AdemPreRule():
         print("Response Error:", response.status_code)
         print("Response Details", response.text)
 
-def Script():
-    AccessResponse = ""
-    print("")
-    print("-------------------------------------")
-    print ("Start ADEM Onboarding Script ")
-    print("-------------------------------------")
-    VerifyAuthResult = verifyauth()
-    if VerifyAuthResult == "success":
-            TokenResult = TokenGeneration()
-            if TokenResult == "success":
-                FQDNobjects()
-                DynamicAddressGroup()
-                AdemPreRule()
-                print("-------------------------------------")
-                print ("Script ended Succesfully")
-                print("-------------------------------------")
-            else:
-                print("")
-                print("Generating Token Failed")
-                print("-------------------------------------")
-                print ("Script ended with issues")
-                print("-------------------------------------")
-    if VerifyAuthResult == "noauth":
-        print("")
-        print("No Existing Authentication")
-        print("")
-        print("Starting Authenitcation process ...")
-        time.sleep(3)
-        Authentication()
-        TokenResult = TokenGeneration()
-        if TokenResult == "success":
-            FQDNobjects()
-            DynamicAddressGroup()
-            AdemPreRule()
-            print("-------------------------------------")
-            print ("Script ended succesfully")
-            print("-------------------------------------")
-        if TokenResult == "fail":
-            print("")
-            print("!! Token failed, Pleae try again !!")
-            print("")
-            print("-------------------------------------")
-            print ("Script ended with issues")
-            print("-------------------------------------")
 
-        time.sleep(2)
-    if VerifyAuthResult == "expired":
-        print("")
-        print("Token expired")
-        print("Restarting authentication proces...")
-        Authentication()
-        TokenResult = TokenGeneration()
-        time.sleep(2)
-        if TokenResult == "success":
-            FQDNobjects()
-            DynamicAddressGroup()
-            AdemPreRule()
-            print("-------------------------------------")
-            print ("Script ended succesfully")
-            print("-------------------------------------")
-        if TokenResult == "fail":
-            print("")
-            print("!! Authentication failed, Please verify credentials !!")
-            print("")
-            print("-------------------------------------")
-            print ("Script ended with issues")
-            print("-------------------------------------")
+
+def login_saas(base_url, tsg_id, client_id, client_secret):
+    url = f"https://{base_url}/oauth2/access_token"
+
+    payload = {
+        "grant_type": "client_credentials",
+        "scope": f"tsg_id:{tsg_id}"
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    response = requests.post(url, data=payload,
+                             headers=headers, auth=(client_id, client_secret))
     
-Script()
+    return response.json().get("access_token")
+
+def getParamFromJson(config_file):
+    f = open(config_file,)
+    params = json.load(f)
+    auth_api_endpoint = params["auth_api_endpoint"]
+    config_api_endpoint = params["config_api_endpoint"]
+    tsg_id = params["tsg_id"]
+    client_id = params["client_id"]
+    client_secret = params["client_secret"]
+    # Closing file
+    f.close()
+    return auth_api_endpoint, config_api_endpoint, tsg_id, client_id, client_secret
+
+
+def main():
+    CONFIG_FILE = os.environ['HOME'] + "/.prismaaccess/credentials.json"
+    AUTH_API_ENDPOINT, CONFIG_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET = getParamFromJson(
+        CONFIG_FILE)
+    access_token = login_saas(
+        AUTH_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET)
+    
+    FQDNobjects(CONFIG_API_ENDPOINT, access_token)
+    DynamicAddressGroup(CONFIG_API_ENDPOINT, access_token)
+    AdemPreRule(CONFIG_API_ENDPOINT, access_token)
+    print("-------------------------------------")
+    print("Script ended succesfully")
+    print("-------------------------------------")
+
+
+if __name__ == "__main__":
+    main()
+
+
