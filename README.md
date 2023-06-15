@@ -39,8 +39,8 @@ due to missing API calls this is currently not possible, waiting for new API too
 # How It Works
 This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.
 In order to leverage the API calls we need to create a Bearer Token to perform the calls.
-- Bearer token [documentation](https://pan.dev/sase/docs/getstarted/)
-- Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/access-tokens/)
+- Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/getstarted/)
+- Bearer token [documentation](https://pan.dev/sase/docs/access-tokens/)
 
 
 If there is no bearer token yet the script will prompt you to authenticate using the Tenant Service Acccount 
