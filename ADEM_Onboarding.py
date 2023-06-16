@@ -12,6 +12,27 @@ def VerifyConfigFile():
     else:
         return (False)
     
+def TAGobject(config_api_endpoint, access_token):
+    print("Creating TAG for ADEM ...\n")
+    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/tags?folder=Shared"
+    payload = json.dumps({"color": "Cyan","name": "TEST" })
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {access_token}"}
+    response = requests.request("POST",ConfigUrl, headers=headers, data=payload)
+    if response.status_code == 201:
+        print("\033[1;32mCreated Object:ADEM TAG Created: " + "\033[0m \t")
+    elif response.status_code == 404:
+        error_messages = []
+        # Extract error messages from 'details'
+        for error in response.json().get("_errors"):
+            details = error.get('details', {})
+            error_messages.append(details.get('message', ''))
+        # Print error messages
+        for message in error_messages:
+            print("\t"+"\033[1;31m"+ message + ": \033[0m" + "'ADEM' TAG Object\n" )
+            
+    else:
+        print("\t\033[1;31m TAG Creation Failed: " + "\033[0m")
+        print ("\tServer Response:" + response.text)
 
 def FQDNobjects(config_api_endpoint, access_token):
     print("Creating FQDN Objects for ADEM ...\n")
@@ -32,7 +53,6 @@ def FQDNobjects(config_api_endpoint, access_token):
             for error in response.json().get("_errors"):
                 details = error.get('details', {})
                 error_messages.append(details.get('message', ''))
-
             # Print error messages
             for message in error_messages:
                 print("\t\033[1;31m"+ message + ": \033[0m" + i )
@@ -147,6 +167,7 @@ def main():
         access_token = login_saas(
             AUTH_API_ENDPOINT, TSG_ID, CLIENT_ID, CLIENT_SECRET)
         print ("Auth Token "+ "\033[1;32m" + "\tSucceeded\033[0m\n")
+        TAGobject(CONFIG_API_ENDPOINT, access_token)
         FQDNobjects(CONFIG_API_ENDPOINT, access_token)
         DynamicAddressGroup(CONFIG_API_ENDPOINT, access_token)
         AdemPreRule(CONFIG_API_ENDPOINT, access_token)
