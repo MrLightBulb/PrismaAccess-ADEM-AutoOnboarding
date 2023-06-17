@@ -25,17 +25,16 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 - Auto Generate all required ADEM FQDN objects under Shared Level
 - Auto Generate a Dynamic Address group that consists all the ADEM FQDN objects
 - Auto Generate a Pre-Rule Policy to allow traffic towards the ADEM FQND Service Objects
+- Commit changes after user input 
 
 # What it cannot do
 
-- Commit the changes, it will only generate a config candidate, this means you still need to perform a commit in the interface
 - Choosing a name convention for your objects.
 - Changing the Global protect App settings to auto enable the ADEM Configuration.
 - Support for Panorama
 
 # Short term Roadmap:
 
-- Auto Commit changes after user input 
 - Adding naming convetion
 
 # Long Term Roadmap:
