@@ -46,7 +46,7 @@ due to missing API calls this is currently not possible, waiting for new API too
 # How It Works
 This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.<br>
 In order to leverage the API calls we need to create a Bearer Token to perform the calls.<br>
-The bearor token is generated from the Tenant Service Account information<br>, which you need to provide in the '/.prismaaccess/credentials.json' file<br>
+The bearor token is generated from the Tenant Service Account information,<br>which you need to provide in the '/.prismaaccess/credentials.json' file<br>
 
 More information how it works can be found in the official Palo Alto Networks documentations:
 - Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/getstarted/)
