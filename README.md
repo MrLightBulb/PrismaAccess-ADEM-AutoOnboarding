@@ -11,11 +11,11 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 
 ```json
 {
-    "auth_api_endpoint": "auth.apps.paloaltonetworks.com",
-    "config_api_endpoint": "api.sase.paloaltonetworks.com",
-    "tsg_id": "<your_tsg_id>",
-    "client_id": "<your_client_id>",
-    "client_secret": "<your_client_secret>"
+    "Auth_Url": "auth.apps.paloaltonetworks.com",
+    "Config_Url": "api.sase.paloaltonetworks.com",
+    "tsg_id": "<Your-TSG-ID>",
+    "client_id": "<Your-Client-ID>",
+    "client_secret": "<Your-Client-Secret>"
 }
 ```
 
