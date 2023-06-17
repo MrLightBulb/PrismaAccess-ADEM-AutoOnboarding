@@ -44,21 +44,21 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 due to missing API calls this is currently not possible, waiting for new API tools for Global Protect.
 
 # How It Works
-This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.
-In order to leverage the API calls we need to create a Bearer Token to perform the calls.
-The bearor token is generated from the Tenant Service Account infomration you need to provide in the '/.prismaaccess/credentials.json' file
+This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.<br>
+In order to leverage the API calls we need to create a Bearer Token to perform the calls.<br>
+The bearor token is generated from the Tenant Service Account information<br>, which you need to provide in the '/.prismaaccess/credentials.json' file<br>
 
 More information how it works can be found in the official Palo Alto Networks documentations:
 - Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/getstarted/)
 - Bearer token [documentation](https://pan.dev/sase/docs/access-tokens/)
 
-A bearor token is valid for 15min.
-Each time you run the script a new unique bearor token is generated. 
+A bearor token is valid for 15min.<br>
+Each time you run the script a new unique bearor token is generated.<br>
 
 # How to use
 when the github respoistory has been downloaded launch the script by following command :
 ```bash
 $ python3 ADEM_Onboarding.py
 ```
-if succesfull your script should end with the message "script ended succefully"
+if succesfull your script should end with the message "script ended succefully"<br>
 if unsuccesfull your script should end with message "sceript ended with issues"
