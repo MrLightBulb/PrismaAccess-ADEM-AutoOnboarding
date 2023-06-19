@@ -15,7 +15,7 @@ def VerifyConfigFile():
 def TAGobject(config_api_endpoint, BearerToken):
     print("Creating TAG for ADEM ...\n")
     ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/tags?folder=Shared"
-    payload = json.dumps({"color": "Cyan","name": "TEST" })
+    payload = json.dumps({"color": "Cyan","name": "ADEM" })
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
     response = requests.request("POST",ConfigUrl, headers=headers, data=payload)
     if response.status_code == 201:
