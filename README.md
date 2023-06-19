@@ -36,6 +36,7 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 # Short term Roadmap:
 
 - Adding naming convetion
+- Choosing your commit scope
 
 # Long Term Roadmap:
 
