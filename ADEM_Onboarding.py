@@ -13,13 +13,13 @@ def VerifyConfigFile():
         return (False)
     
 def TAGobject(config_api_endpoint, BearerToken):
-    print("Creating TAG for ADEM ...\n")
+    print("Creating TAG for ADEM ...")
     ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/tags?folder=Shared"
     payload = json.dumps({"color": "Cyan","name": "ADEM" })
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
     response = requests.request("POST",ConfigUrl, headers=headers, data=payload)
     if response.status_code == 201:
-        print("\033[1;32mCreated Object:ADEM TAG Created: " + "\033[0m \t")
+        print("\t\033[1;32mTag Object Created:\033[0m\tADEM\n")
     elif response.status_code == 404:
         error_messages = []
         # Extract error messages from 'details'
@@ -31,7 +31,7 @@ def TAGobject(config_api_endpoint, BearerToken):
             print("\t"+"\033[1;31m"+ message + ": \033[0m" + "'ADEM' TAG Object\n" )
             
     else:
-        print("\t\033[1;31m TAG Creation Failed: " + "\033[0m")
+        print("\t\033[1;31m TAG Object Creation Failed: " + "\033[0m")
         print ("\tServer Response:" + response.text)
 
 def FQDNobjects(config_api_endpoint, BearerToken):
@@ -46,7 +46,7 @@ def FQDNobjects(config_api_endpoint, BearerToken):
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
         response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
         if response.status_code == 201:
-            print("\033[1;32m" + "Object Created: " + "\033[0m \t" + i)
+            print("\t\033[1;32m" + "FQDN Object Created: " + "\033[0m \t" + i)
         elif response.status_code == 404:
             error_messages = []
             # Extract error messages from 'details'
@@ -186,9 +186,7 @@ def commit(BearerToken):
         # Print error messages
         for message in error_messages:
             print("\tCommit Changes Initiation \033[1;31mFailed\033[0m)" )
-            print("Reason:\t" + "\033[1;31m"+ message + ": \033[0m")
-
-   
+            print("\tReason:\t" + "\033[1;31m"+ message + ": \033[0m")
 
 
 def AskYesNo():
@@ -218,7 +216,7 @@ def main():
         Auth_Url, Config_Url, TSG_ID, CLIENT_ID, CLIENT_SECRET = getParamFromJson(CONFIG_FILE)
         #token generation
         BearerToken = getBearerToken(Auth_Url, TSG_ID, CLIENT_ID, CLIENT_SECRET)
-        print ("Auth Token "+ "\033[1;32m" + "\tSucceeded\033[0m\n")
+        print ("\tAuth Token "+ "\033[1;32m" + "\tSucceeded\033[0m\n")
         TAGobject(Config_Url, BearerToken)
         FQDNobjects(Config_Url, BearerToken)
         DynamicAddressGroup(Config_Url, BearerToken)
@@ -227,7 +225,7 @@ def main():
         if AskYesNoResult == True:
             commit(BearerToken)
         elif AskYesNoResult == False:
-            print ("\n Changes \033[1;32mSaved \033[0m, Changes \033[1;31mNOT Commited\033[0m")
+            print ("\n\tChanges \033[1;32mSaved \033[0m, Changes \033[1;31mNOT Commited\033[0m")
         print("\n-------------------------------------")
         print("Script ended succesfully")
         print("-------------------------------------")
