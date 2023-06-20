@@ -122,6 +122,64 @@ def AdemPreRule(config_api_endpoint, BearerToken):
         for message in error_messages:
             print("\t" + "\033[1;31mShared PreRule "+ message + ": \033[0m" + "ADEM\n" )
 
+def DecryptProfile():
+        print("Verifying Decrypt Profile")
+        return True
+def DecryptRule(config_api_endpoint, BearerToken):
+    print("Creating \"ADEM NoDecrypt\" Decryption Rule in Shared ... \n")
+    time.sleep(2)
+    DecryptUrl = f"https://{config_api_endpoint}/sse/config/v1/decryption-rules?position=pre&folder=Shared"
+    payload = json.dumps({
+        "name": "ADEM - NoDecrypt",
+        "action": "no-decrypt",
+        "description": "ADEM No Decrypt Rule",
+        "source": [
+            "any"
+        ],
+        "source_user": [
+            "any"
+        ],
+        "from": [
+            "trust"
+        ],
+        "destination": [
+            "ADEM"
+        ],
+        "to": [
+            "untrust"
+        ],
+        "category": [
+            "any"
+        ],
+        "service": [
+            "any"
+        ],
+        "disabled": False,
+        "log_fail": True,
+        "log_success": True,
+        "profile": "ADEM_Decrypt_Profile",
+        "tag": [
+            "ADEM"
+        ],
+        "type": {
+            "ssl_forward_proxy": {}
+        }
+    })
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
+    response = requests.request("POST", DecryptUrl, headers=headers, data=payload)
+    if response.status_code == 201:
+        print("\tADEM No Decrypt Rule Creation\t\033[1;32m\tSuccess\033[0m\n")
+    else:
+        error_messages = []
+        print(response.text)
+        # Extract error messages from 'details'
+       # for error in response.json().get("_errors"):
+        #    details = error.get('details', {})
+         #   error_messages.append(details.get('message', ''))
+
+        # Print error messages
+        for message in error_messages:
+            print("\t" + "\033[1;31mNo Decrypt Rule"+ message + ": \033[0m" + "ADEM NoDecrypt\n" )
 
 
 def getBearerToken(auth_url, tsg_id, client_id, client_secret):
@@ -189,20 +247,19 @@ def commit(BearerToken):
             print("\tReason:\t" + "\033[1;31m"+ message + ": \033[0m")
 
 
-def AskYesNo():
-
+def AskCommit():
     prompt = 'Do you want to commit these changes ? (y/n): '
     ans = input(prompt).strip().lower()
     if ans not in ['y', 'n']:
         print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
-        return AskYesNo()
+        return AskCommit()
     if ans in ['y','Y','yes','Yes','YES']:
         return True
     if ans in ['n','N','no','No','NO']:
         return False
     else:
         print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
-        return AskYesNo()
+        return AskCommit()
 
 def main():
     print("\n-------------------------------------")
@@ -221,10 +278,11 @@ def main():
         FQDNobjects(Config_Url, BearerToken)
         DynamicAddressGroup(Config_Url, BearerToken)
         AdemPreRule(Config_Url, BearerToken)
-        AskYesNoResult = AskYesNo()
-        if AskYesNoResult == True:
+        DecryptRule(Config_Url, BearerToken)
+        CommitConfirm = AskCommit()
+        if CommitConfirm == True:
             commit(BearerToken)
-        elif AskYesNoResult == False:
+        elif CommitConfirm == False:
             print ("\n\tChanges \033[1;32mSaved \033[0m, Changes \033[1;31mNOT Commited\033[0m")
         print("\n-------------------------------------")
         print("Script ended succesfully")
