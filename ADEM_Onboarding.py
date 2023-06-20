@@ -13,7 +13,7 @@ def VerifyConfigFile():
         return (False)
     
 def TAGobject(config_api_endpoint, BearerToken):
-    print("Creating TAG for ADEM ...")
+    print("Creating TAG for ADEM ...\n")
     ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/tags?folder=Shared"
     payload = json.dumps({"color": "Cyan","name": "ADEM" })
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
@@ -28,7 +28,7 @@ def TAGobject(config_api_endpoint, BearerToken):
             error_messages.append(details.get('message', ''))
         # Print error messages
         for message in error_messages:
-            print("\t"+"\033[1;31m"+ message + ": \033[0m" + "'ADEM' TAG Object\n" )
+            print("\t\033[1;31mTAG Object "+ message +":\033[0m"+" ADEM\n")
             
     else:
         print("\t\033[1;31m TAG Object Creation Failed: " + "\033[0m")
@@ -55,7 +55,7 @@ def FQDNobjects(config_api_endpoint, BearerToken):
                 error_messages.append(details.get('message', ''))
             # Print error messages
             for message in error_messages:
-                print("\t\033[1;31m"+ message + ": \033[0m" + i )
+                print("\t\033[1;31mFQDN "+ message + ": \033[0m" + i )
             
         else:
             print("\n"+"\033[1;31m"+"Object Error:"+ "\033[0m\t" + i)
@@ -85,7 +85,7 @@ def DynamicAddressGroup(config_api_endpoint, BearerToken):
 
         # Print error messages
         for message in error_messages:
-            print("\t"+"\033[1;31m"+ message + ": \033[0m" + "ADEM (address group)\n" )
+            print("\t"+"\033[1;31mDynamic AddressGroup "+ message + ": \033[0mADEM\n" )
 
 
 def AdemPreRule(config_api_endpoint, BearerToken):
@@ -120,7 +120,7 @@ def AdemPreRule(config_api_endpoint, BearerToken):
 
         # Print error messages
         for message in error_messages:
-            print("\t" + "\033[1;31m"+ message + ": \033[0m" + "ADEM (PreRule Security Rule in Shared)\n" )
+            print("\t" + "\033[1;31mShared PreRule "+ message + ": \033[0m" + "ADEM\n" )
 
 
 
@@ -208,7 +208,7 @@ def main():
     print("\n-------------------------------------")
     print("Script Started")
     print("-------------------------------------\n")
-    print("Generating Auth Token ...")
+    print("Generating Auth Token ...\n")
     time.sleep(2)       
     if VerifyConfigFile() == True:
         CONFIG_FILE = "./prismaaccess/credentials.json"
@@ -216,7 +216,7 @@ def main():
         Auth_Url, Config_Url, TSG_ID, CLIENT_ID, CLIENT_SECRET = getParamFromJson(CONFIG_FILE)
         #token generation
         BearerToken = getBearerToken(Auth_Url, TSG_ID, CLIENT_ID, CLIENT_SECRET)
-        print ("\tAuth Token "+ "\033[1;32m" + "\tSucceeded\033[0m\n")
+        print ("\tAuth Token Generation"+ "\033[1;32m" + "\tSucceeded\033[0m\n")
         TAGobject(Config_Url, BearerToken)
         FQDNobjects(Config_Url, BearerToken)
         DynamicAddressGroup(Config_Url, BearerToken)
