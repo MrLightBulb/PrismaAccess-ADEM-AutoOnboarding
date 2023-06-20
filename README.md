@@ -7,7 +7,7 @@ Define a Prisma Access Tenant `Service Account`, here is a [howto](https://docs.
 
 This service account is required in order to create an access token to use the API infrastructure of your Prisma Acces Tenant
 
-Create a file into home directory `.prismaaccess/credentials.json` with the following structure:
+Create a file into the script directory `.prismaaccess/credentials.json` with the following structure:
 
 ```json
 {
