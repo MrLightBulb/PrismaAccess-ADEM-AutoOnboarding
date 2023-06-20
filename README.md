@@ -23,30 +23,34 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 
 - This only works for Prisma Access Cloud Management
 - Auto Generate all required ADEM FQDN objects under Shared Level
-- Auto Generate a Dynamic Address group that consists all the ADEM FQDN objects
-- Auto Generate a Pre-Rule Policy to allow traffic towards the ADEM FQND Service Objects
-- Commit changes after user input 
+- Auto Generate a Dynamic Address group that consists of all the ADEM FQDN objects
+- Auto Generate a Pre-Rule Policy to allow traffic toward the ADEM FQND Service Objects
+- Commit changes after user input
+- Tenant by Tenant (run script per tenant)
 
 # What it cannot do
 
 - Choosing a name convention for your objects.
-- Changing the Global protect App settings to auto enable the ADEM Configuration.
+- Changing the Global Protect App settings to auto-enable the ADEM Configuration.
 - Support for Panorama
+- Multi-Tenant Support (run the script once for multiple tenants for MSSP)
 
-# Short term Roadmap:
+# Short-term Roadmap:
 
-- Adding naming convetion
+- NoDecrypt Rule for ADEM, with Dedicated Decrypt Profile.
+- Adding naming convention
 - Choosing your commit scope
 
-# Long Term Roadmap:
+# Long-Term Roadmap:
 
 - changing the global app settings with ADEM Config 
-due to missing API calls this is currently not possible, waiting for new API tools for Global Protect.
+due to missing API calls is currently not possible, waiting for new API tools for Global Protect.
+- MSSP Support, Onboard to multiple tenants at once or selective. 
 
 # How It Works
 This script is leveraging the Prisma Access Cloud Mgmt API infrastructure.<br>
 In order to leverage the API calls we need to create a Bearer Token to perform the calls.<br>
-The bearor token is generated from the Tenant Service Account information,<br>which you need to provide in the '/.prismaaccess/credentials.json' file<br>
+The bearer token is generated from the Tenant Service Account information,<br>which you need to provide in the '/.prismaaccess/credentials.json' file<br>
 
 More information how it works can be found in the official Palo Alto Networks documentations:
 - Prisma Access Tenant Service Account [documentation](https://pan.dev/sase/docs/getstarted/)
