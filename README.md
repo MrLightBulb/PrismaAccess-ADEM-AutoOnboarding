@@ -25,6 +25,7 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 - Auto Generate all required ADEM FQDN objects under Shared Level
 - Auto Generate a Dynamic Address group that consists of all the ADEM FQDN objects
 - Auto Generate a Pre-Rule Policy to allow traffic toward the ADEM FQND Service Objects
+- Auto Generate Decryption Rule and Decrypt Profile for ADEM
 - Commit changes after user input
 - Tenant by Tenant (run script per tenant)
 
@@ -37,7 +38,6 @@ Create a file into home directory `.prismaaccess/credentials.json` with the foll
 
 # Short-term Roadmap:
 
-- NoDecrypt Rule for ADEM, with Dedicated Decrypt Profile.
 - Adding naming convention
 - Choosing your commit scope
 
