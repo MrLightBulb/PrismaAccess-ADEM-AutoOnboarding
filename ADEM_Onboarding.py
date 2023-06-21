@@ -12,9 +12,9 @@ def VerifyConfigFile():
     else:
         return (False)
     
-def TAGobject(config_api_endpoint, BearerToken):
+def TAGobject(Config_Url, BearerToken):
     print("Creating TAG for ADEM ...\n")
-    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/tags?folder=Shared"
+    ConfigUrl = f"https://{Config_Url}/sse/config/v1/tags?folder=Shared"
     payload = json.dumps({"color": "Cyan","name": "ADEM" })
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
     response = requests.request("POST",ConfigUrl, headers=headers, data=payload)
@@ -34,13 +34,13 @@ def TAGobject(config_api_endpoint, BearerToken):
         print("\t\033[1;31m TAG Object Creation Failed: " + "\033[0m")
         print ("\tServer Response:" + response.text)
 
-def FQDNobjects(config_api_endpoint, BearerToken):
+def FQDNobjects(Config_Url, BearerToken):
     print("Creating FQDN Objects for ADEM ...\n")
     time.sleep(2)
     with open("ademfqdn.txt", "r") as file:
         AdemFQDN = file.read().splitlines()
 
-    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/addresses?folder=Shared"
+    ConfigUrl = f"https://{Config_Url}/sse/config/v1/addresses?folder=Shared"
     for i in AdemFQDN:
         payload = json.dumps({"description": "ADEM via API", "name": i, "tag": ["ADEM"], "fqdn": i})
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
@@ -64,9 +64,9 @@ def FQDNobjects(config_api_endpoint, BearerToken):
 
 
 
-def DynamicAddressGroup(config_api_endpoint, BearerToken):
+def DynamicAddressGroup(Config_Url, BearerToken):
     # Creating Dynamic Address Group For ADEM
-    ConfigUrl = f"https://{config_api_endpoint}/sse/config/v1/address-groups?folder=Shared"
+    ConfigUrl = f"https://{Config_Url}/sse/config/v1/address-groups?folder=Shared"
     payload = json.dumps({"description": "ADEM Group via API", "name": "ADEM", "dynamic": {"filter": "ADEM"}})
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
     response = requests.request("POST", ConfigUrl, headers=headers, data=payload)
@@ -88,10 +88,10 @@ def DynamicAddressGroup(config_api_endpoint, BearerToken):
             print("\t"+"\033[1;31mDynamic AddressGroup "+ message + ": \033[0mADEM\n" )
 
 
-def AdemPreRule(config_api_endpoint, BearerToken):
+def AdemPreRule(Config_Url, BearerToken):
     print("Creating ADEM Pre Rule in Shared ... \n")
     time.sleep(2)
-    PolicyUrl = f"https://{config_api_endpoint}/sse/config/v1/security-rules?position=pre&folder=Shared"
+    PolicyUrl = f"https://{Config_Url}/sse/config/v1/security-rules?position=pre&folder=Shared"
     payload = json.dumps(
         {
             "name": "ADEM",
@@ -122,6 +122,125 @@ def AdemPreRule(config_api_endpoint, BearerToken):
         for message in error_messages:
             print("\t" + "\033[1;31mShared PreRule "+ message + ": \033[0m" + "ADEM\n" )
 
+def DecryptProfile(Config_Url, BearerToken):
+    print("Creating ADEM Decryption Profile in Shared ... \n")
+    time.sleep(2)
+    DecryptProfileUrl = f"https://{Config_Url}/sse/config/v1/decryption-profiles?folder=Shared"
+    payload = json.dumps({
+    "name": "ADEM_DecryptProfile",
+    "ssl_forward_proxy": {
+        "auto_include_altname": False,
+        "block_client_cert": False,
+        "block_expired_certificate": True,
+        "block_timeout_cert": False,
+        "block_tls13_downgrade_no_resource": False,
+        "block_unknown_cert": False,
+        "block_unsupported_cipher": False,
+        "block_unsupported_version": False,
+        "block_untrusted_issuer": False,
+        "restrict_cert_exts": False,
+        "strip_alpn": False
+    },
+    "ssl_no_proxy": {
+        "block_expired_certificate": True,
+        "block_untrusted_issuer": False
+    },
+    "ssl_protocol_settings": {
+        "auth_algo_md5": True,
+        "auth_algo_sha1": True,
+        "auth_algo_sha256": True,
+        "auth_algo_sha384": True,
+        "enc_algo_3des": True,
+        "enc_algo_aes_128_cbc": True,
+        "enc_algo_aes_128_gcm": True,
+        "enc_algo_aes_256_cbc": True,
+        "enc_algo_aes_256_gcm": True,
+        "enc_algo_chacha20_poly1305": True,
+        "enc_algo_rc4": True,
+        "keyxchg_algo_dhe": True,
+        "keyxchg_algo_ecdhe": True,
+        "keyxchg_algo_rsa": True,
+        "max_version": "max",
+        "min_version": "tls1-0"
+    }
+    })
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer <TOKEN>'
+    }
+
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
+    response = requests.request("POST", DecryptProfileUrl, headers=headers, data=payload)
+    if response.status_code == 201:
+        print("\tADEM Decrypt Profile Creation\t\033[1;32m\tSuccess\033[0m\n")
+    else:
+        error_messages = []
+        
+        #Extract error messages from 'details'
+        for error in response.json().get("_errors"):
+            details = error.get('details', {})
+            error_messages.append(details.get('message', ''))
+
+        #Print error messages
+        for message in error_messages:
+            print("\t" + "\033[1;31mDecrypt Profile "+ message + ": \033[0m" + "ADEM_DecryptProfile\n" )
+
+
+def DecryptRule(Config_Url, BearerToken):
+    print("Creating \"ADEM NoDecrypt\" Decryption Rule in Shared ... \n")
+    time.sleep(2)
+    DecryptUrl = f"https://{Config_Url}/sse/config/v1/decryption-rules?position=pre&folder=Shared"
+    payload = json.dumps({
+        "name": "ADEM - NoDecrypt",
+        "action": "no-decrypt",
+        "description": "ADEM No Decrypt Rule",
+        "source": [
+            "any"
+        ],
+        "source_user": [
+            "any"
+        ],
+        "from": [
+            "trust"
+        ],
+        "destination": [
+            "ADEM"
+        ],
+        "to": [
+            "untrust"
+        ],
+        "category": [
+            "any"
+        ],
+        "service": [
+            "any"
+        ],
+        "disabled": False,
+        "log_fail": True,
+        "log_success": True,
+        "profile": "ADEM_DecryptProfile",
+        "tag": [
+            "ADEM"
+        ],
+        "type": {
+            "ssl_forward_proxy": {}
+        }
+    })
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {BearerToken}"}
+    response = requests.request("POST", DecryptUrl, headers=headers, data=payload)
+    if response.status_code == 201:
+        print("\tADEM No Decrypt Rule Creation\t\033[1;32m\tSuccess\033[0m\n")
+    else:
+        error_messages = []
+
+        #Extract error messages from 'details'
+        for error in response.json().get("_errors"):
+            details = error.get('details', {})
+            error_messages.append(details.get('message', ''))
+
+        # Print error messages
+        for message in error_messages:
+            print("\t" + "\033[1;31mDecryption Rule "+ message + ": \033[0m" + "ADEM NoDecrypt\n" )
 
 
 def getBearerToken(auth_url, tsg_id, client_id, client_secret):
@@ -189,20 +308,19 @@ def commit(BearerToken):
             print("\tReason:\t" + "\033[1;31m"+ message + ": \033[0m")
 
 
-def AskYesNo():
-
+def AskCommit():
     prompt = 'Do you want to commit these changes ? (y/n): '
     ans = input(prompt).strip().lower()
     if ans not in ['y', 'n']:
         print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
-        return AskYesNo()
+        return AskCommit()
     if ans in ['y','Y','yes','Yes','YES']:
         return True
     if ans in ['n','N','no','No','NO']:
         return False
     else:
         print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
-        return AskYesNo()
+        return AskCommit()
 
 def main():
     print("\n-------------------------------------")
@@ -221,10 +339,12 @@ def main():
         FQDNobjects(Config_Url, BearerToken)
         DynamicAddressGroup(Config_Url, BearerToken)
         AdemPreRule(Config_Url, BearerToken)
-        AskYesNoResult = AskYesNo()
-        if AskYesNoResult == True:
+        DecryptProfile(Config_Url,BearerToken)
+        DecryptRule(Config_Url, BearerToken)
+        CommitConfirm = AskCommit()
+        if CommitConfirm == True:
             commit(BearerToken)
-        elif AskYesNoResult == False:
+        elif CommitConfirm == False:
             print ("\n\tChanges \033[1;32mSaved \033[0m, Changes \033[1;31mNOT Commited\033[0m")
         print("\n-------------------------------------")
         print("Script ended succesfully")
