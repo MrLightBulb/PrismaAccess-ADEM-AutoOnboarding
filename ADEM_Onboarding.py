@@ -312,14 +312,14 @@ def AskCommit():
     prompt = 'Do you want to commit these changes ? (y/n): '
     ans = input(prompt).strip().lower()
     if ans not in ['y', 'n']:
-        print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
+        print("\033[1;31m\t" + ans + "\033[0m is \033[1;31mInvalid \033[0m, please try again...\n")
         return AskCommit()
     if ans in ['y','Y','yes','Yes','YES']:
         return True
     if ans in ['n','N','no','No','NO']:
         return False
     else:
-        print(f'{ans} is \033[1;31mInvalid \033[0m, please try again...\n')
+        print("\033[1;31m\t" + ans + "\033[0m is \033[1;31mInvalid \033[0mplease try again...\n")
         return AskCommit()
 
 def main():
